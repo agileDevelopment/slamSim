@@ -14,7 +14,10 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 import edu.afit.csce723.p2.errorRobot.Environment;
+import edu.afit.csce723.p2.errorRobot.EstimationApproach;
+import edu.afit.csce723.p2.errorRobot.Maze;
 import edu.afit.csce723.p2.errorRobot.Observer;
+import edu.afit.csce723.p2.errorRobot.RobotSLAM;
 import edu.afit.csce723.p2.robotSLAM.PositionEstimatePanel;
 import edu.afit.csce723.p2.robotSLAM.InternalMapPanel;
 
@@ -23,10 +26,18 @@ import edu.afit.csce723.p2.robotSLAM.InternalMapPanel;
  * @author Student 2
  *
  */
-public class FastSLAM implements Observer<Environment> {
+public class FastSLAM implements EstimationApproach {
 
-	public FastSLAM(Environment environment) {
+	/**
+     * @param args
+     */
+    public static void main(String[] args) {
+    	new RobotSLAM(new MonteCarloLocalization(), Maze.getExplorerMap()).run();
+    }
+    
+	public void setup(Environment environment, Maze unused) {
 		environment.registerObserver(this);
+		
 	}
 
 	public void update(Environment subject) {
@@ -57,12 +68,12 @@ public class FastSLAM implements Observer<Environment> {
 		panelB.repaint();
 	}
 
-	public Component getPanelA() {
+	public Component getPositionEstimatePanel() {
 		// TODO This panel is registered to the main panel for your use.
 		return panelA;
 	}
 
-	public Component getPanelB() {
+	public Component getInternalMapPanel() {
 		// TODO This panel is registered to the main panel for your use.
 		return panelB;
 	}

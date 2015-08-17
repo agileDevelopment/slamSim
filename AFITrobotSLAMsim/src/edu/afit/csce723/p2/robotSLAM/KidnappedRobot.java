@@ -10,12 +10,17 @@
 package edu.afit.csce723.p2.robotSLAM;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
 import edu.afit.csce723.p2.errorRobot.Environment;
 import edu.afit.csce723.p2.errorRobot.Maze;
 import edu.afit.csce723.p2.errorRobot.Observer;
+import edu.afit.csce723.p2.errorRobot.Position;
+import edu.afit.csce723.p2.errorRobot.RobotSLAM;
 import edu.afit.csce723.p2.robotSLAM.PositionEstimatePanel;
 import edu.afit.csce723.p2.robotSLAM.InternalMapPanel;
 
@@ -26,8 +31,19 @@ import edu.afit.csce723.p2.robotSLAM.InternalMapPanel;
  */
 public class KidnappedRobot implements Observer<Environment> {
 
-	public KidnappedRobot(Environment environment) {
-		theMap = Maze.getExplorerMap();		
+	private List<Position> population = new ArrayList<Position>();
+	private Random rand = new Random();	
+	private Maze theMap;
+
+	/**
+     * @param args
+     */
+    public static void main(String[] args) {
+    	new RobotSLAM(new MonteCarloLocalization(), Maze.getExplorerMap()).run();
+    }
+    
+	public void setup(Environment environment, Maze map) {
+		theMap = map;		
 		environment.registerObserver(this);
 	}
 
@@ -70,7 +86,6 @@ public class KidnappedRobot implements Observer<Environment> {
 		return panelB;
 	}
 
-	private final Maze theMap;
 	private final PositionEstimatePanel panelA = new PositionEstimatePanel();  // For rendering the population's distribution of positions
 	private final InternalMapPanel panelB = new InternalMapPanel();  // For rendering the systems internal map
 }
