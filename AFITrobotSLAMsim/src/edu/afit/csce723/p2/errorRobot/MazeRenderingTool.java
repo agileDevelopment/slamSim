@@ -12,9 +12,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.List;
 
 /**
  *
@@ -89,14 +91,14 @@ public class MazeRenderingTool {
 		renderEnvironment(theMaze, robot, path, g, size);
 	}
 
-	public void renderPositions(Collection<Position> points, Color aColor, Graphics g, Dimension size) {
+	public void renderPositions(Collection<Position> points, int aSize, Color aColor, Graphics g, Dimension size) {
 		for (Position p : points) {
-			drawPoint(p.getPoint2D(), aColor, g, size);
+			drawPoint(p.getPoint2D(), aSize, aColor, g, size, theMaze);
 		}
 	}
 	
-	public void renderPoints(Maze theMaze, Collection<Point2D> points, Color aColor, Graphics g, Dimension size) {
-        drawPoints(points, aColor, g, size);
+	public void renderPoints(Maze theMaze, Collection<Point2D> points, int aSize, Color aColor, Graphics g, Dimension size) {
+        drawPoints(points, aSize, aColor, g, size);
     }
 
     private Line2D scale(Line2D line, double width, double height) {
@@ -206,24 +208,14 @@ public class MazeRenderingTool {
     }
 
     private void drawRobotPath(Path thePath, Graphics g, Dimension size) {
-        Graphics2D g2 = (Graphics2D) g;
-        setSize(size);
-
-        double width = theMaze.getWidth();
-        double height = theMaze.getHeight();
-
-        int x, y, dx, dy;
         // Draw the robot path as positions that fade from dark gray (55, 55, 55) to white (255, 255, 255)
         double color = 200.0;
         double step = color / thePath.size();
 
+        Color aColor = new Color((int) color, (int) color, (int) color);
         for (Position pt : thePath) {
-            g2.setColor(new Color((int) color, (int) color, (int) color));
-            x = scale(pt.getX() - 4, width, height);
-            y = scale(pt.getY() - 4, width, height);
-            dx = scale(8, width, height);
-            dy = scale(8, width, height);
-            g2.fill(new Ellipse2D.Double(x, y, dx, dy));
+        	aColor = new Color((int) color, (int) color, (int) color);
+        	drawPoint(pt, 3, aColor, g, size, theMaze);
             color -= step;
             color = Math.max(Math.min(color, 255), 0);
         }
@@ -233,7 +225,7 @@ public class MazeRenderingTool {
         Graphics2D g2 = (Graphics2D) g;
         setSize(size);
         
-        drawPoints(sensorPoints, Color.RED, g2, size);
+        drawPoints(sensorPoints, 1, Color.RED, g2, size);
 	}
 
 	public void setBackground(Color aColor, Graphics g, Dimension size) {
@@ -243,26 +235,34 @@ public class MazeRenderingTool {
         g2.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
     }
 
-    private void drawPoints(Collection<Point2D> points, Color aColor, Graphics g, Dimension size) {
+    private void drawPoints(Collection<Point2D> points, int radius, Color aColor, Graphics g, Dimension size) {
         for (Point2D pt : points) {
-        	drawPoint(pt, aColor, g, size);
+        	drawPoint(pt, radius, aColor, g, size, theMaze);
         }
     }
     
-    private void drawPoint(Point2D pt, Color aColor, Graphics g, Dimension size) {
-        Graphics2D g2 = (Graphics2D) g;
-        setSize(size);
+    private void drawPoint(Point2D pt, int aRadius, Color aColor, Graphics g, Dimension size, Maze aMaze) {
+        double width = aMaze.getWidth();
+        double height = aMaze.getHeight();
 
-        double width = theMaze.getWidth();
-        double height = theMaze.getHeight();
+        drawPoint(pt,  aRadius, aColor, g, size, width, height);
+    }
+
+    private void drawPoint(Point2D pt, int aRadius, Color aColor, Graphics g, Dimension size, double width, double height) {
+        // The minimum radius size is 1. 
+    	if (aRadius < 1) 
+    		return;
+    	
+    	Graphics2D g2 = (Graphics2D) g;
+        setSize(size);
 
         int x, y, dx, dy;
         g2.setColor(aColor);
 
-        x = scale(pt.getX() - 1, width, height);
-        y = scale(pt.getY() - 1, width, height);
-        dx = scale(3, width, height);
-        dy = scale(3, width, height);
+        x = scale(pt.getX() - aRadius, width, height);
+        y = scale(pt.getY() - aRadius, width, height);
+        dx = scale(2 * aRadius + 1, width, height);
+        dy = scale(2 * aRadius + 1, width, height);
         g2.fill(new Ellipse2D.Double(x, y, dx, dy));
     }
 

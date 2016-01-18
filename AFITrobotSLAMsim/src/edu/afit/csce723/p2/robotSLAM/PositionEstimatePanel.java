@@ -11,7 +11,6 @@ package edu.afit.csce723.p2.robotSLAM;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -34,7 +33,7 @@ public class PositionEstimatePanel extends JPanel {
         g.translate(-theMap.getOffset().width, -theMap.getOffset().height);
         renderer.drawTheMaze(theMap, g, getSize());
         if (positions != null) {
-        	renderer.renderPositions(positions, Color.RED, g, getSize());
+        	renderer.renderPositions(positions, 1, Color.RED, g, getSize());
         }
     }
 
