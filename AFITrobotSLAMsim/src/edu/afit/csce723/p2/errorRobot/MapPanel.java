@@ -39,10 +39,7 @@ public class MapPanel extends JPanel implements Observer<Environment> {
 		robotPath.add(robotPose);
 		Map<Double, Double> rangeReadings = env.getRobotSensorReadings();
 		
-		Collection<Point2D> current = new ArrayList<Point2D>();
-		for (Double angleKey : rangeReadings.keySet()) {
-			current.add(convertToCartesian(robotPose, angleKey, rangeReadings.get(angleKey)));
-		}
+		Collection<Point2D> current = Util.convertToCartesian(robotPose, rangeReadings);
 		
 		if (sensors.size() > 10) {
 			sensors.removeFirst();
@@ -51,18 +48,6 @@ public class MapPanel extends JPanel implements Observer<Environment> {
 		repaint();
 	}
 	
-	// Cartesian 
-	private Point2D convertToCartesian(Position pose, Double angle, Double range) {
-		Double x = pose.getX();
-		Double y = pose.getY();
-		
-		Double theta = Util.normalize(pose.getTheta() + angle);
-		Double dx = Math.cos(theta) * range;
-		Double dy = Math.sin(theta) * range;
-		
-		return new Point2D.Double(x + dx, y+ dy);
-	}
-
 	synchronized public void paintComponent(Graphics g) {
         super.paintComponent(g);
         

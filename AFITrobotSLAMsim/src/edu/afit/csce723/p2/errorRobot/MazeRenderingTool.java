@@ -248,6 +248,10 @@ public class MazeRenderingTool {
         drawPoint(pt,  aRadius, aColor, g, size, width, height);
     }
 
+    public void drawPoint(Point2D pt, int aRadius, Color aColor, Graphics g, Dimension size) {
+    	drawPoint(pt, aRadius, aColor, g, size, size.getWidth(), size.getHeight());
+    }
+
     private void drawPoint(Point2D pt, int aRadius, Color aColor, Graphics g, Dimension size, double width, double height) {
         // The minimum radius size is 1. 
     	if (aRadius < 1) 

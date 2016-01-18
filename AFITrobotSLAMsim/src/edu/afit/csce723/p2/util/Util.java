@@ -11,9 +11,13 @@ package edu.afit.csce723.p2.util;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import edu.afit.csce723.p2.errorRobot.Maze;
+import edu.afit.csce723.p2.errorRobot.Position;
 import edu.afit.csce723.p2.errorRobot.Robot;
 
 
@@ -187,6 +191,26 @@ public class Util {
 			euclidianDist += Math.pow(alpha.get(i) - beta.get(i), 2);
 		}
 		return Math.sqrt(euclidianDist);
+	}
+
+	// Cartesian 
+	private static Point2D convertToCartesian(Position pose, Double angle, Double range) {
+		Double x = pose.getX();
+		Double y = pose.getY();
+		
+		Double theta = Util.normalize(pose.getTheta() + angle);
+		Double dx = Math.cos(theta) * range;
+		Double dy = Math.sin(theta) * range;
+		
+		return new Point2D.Double(x + dx, y+ dy);
+	}
+
+	public static Collection<Point2D> convertToCartesian(Position robotPose, Map<Double, Double> rangeReadings) {
+		Collection<Point2D> retVal = new HashSet<Point2D>();
+		for (Double angleKey : rangeReadings.keySet()) {
+			retVal.add(convertToCartesian(robotPose, angleKey, rangeReadings.get(angleKey)));
+		}
+		return retVal;
 	}
 
 }
