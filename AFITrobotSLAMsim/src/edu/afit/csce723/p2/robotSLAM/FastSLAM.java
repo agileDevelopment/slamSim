@@ -44,8 +44,7 @@ public class FastSLAM implements EstimationApproach {
 		subject.getRobotPose();		 // Where the robot believes that it is. 
 		subject.getRobotVelocity();  // The velocity according to the robot. 
 		subject.getRobotTurnRate();  // The turn rate according to the robot. 
-		subject.getRobotSensorReadings(); // The sensor range readings from the robot. 
-		subject.getSensorAngles(); 	 // The relative angle of each sensors reading. 
+		subject.getRobotSensorReadings(); // The sensor range readings from the robot.
 		
 		// TODO This is where you will implement your SLAM algorithm.
 		
@@ -64,20 +63,23 @@ public class FastSLAM implements EstimationApproach {
 		// aligned with the actual map.  ---GOOD LUCK!!--
 		
 		// There are two JPanels registered to the main window for you to paint on. 
-		panelA.repaint();
-		panelB.repaint();
+		f_positionEstimatePanel.repaint();
+		f_internalMapPanel.repaint();
 	}
 
 	public Component getPositionEstimatePanel() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelA;
+		return f_positionEstimatePanel;
 	}
 
 	public Component getInternalMapPanel() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelB;
+		return f_internalMapPanel;
 	}
 
-	private final PositionEstimatePanel panelA = new PositionEstimatePanel();  // For rendering the population's distribution of positions
-	private final InternalMapPanel panelB = new InternalMapPanel();  // For rendering the systems internal map
+	// For rendering the population's distribution of positions
+	private final PositionEstimatePanel f_positionEstimatePanel = new PositionEstimatePanel();  
+	
+	// For rendering the systems internal map
+	private final InternalMapPanel f_internalMapPanel = new InternalMapPanel();
 }

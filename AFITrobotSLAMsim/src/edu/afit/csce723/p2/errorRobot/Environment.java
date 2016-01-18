@@ -11,10 +11,8 @@ package edu.afit.csce723.p2.errorRobot;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.text.DecimalFormat;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import edu.afit.csce723.p2.behaviorFramework.Behavior;
@@ -37,7 +35,7 @@ public class Environment extends Observable implements KeyListener {
         myRobotBehavior = robotBehavior;
         
         errorRobot = new Robot(trueRobot.getPosition());
-        errorSensorArray = new LinkedList<Double>();
+        errorSensorArray = new HashMap<Double, Double>();
         
         path = new Path();
     }
@@ -75,9 +73,11 @@ public class Environment extends Observable implements KeyListener {
     	// Limits the length of the sensor beam to intersection of the nearest wall
     	Util.trimRobotSensors(trueRobot, myMap);
 
+    	Map<Double, Double> rangeSet = trueRobot.getSensorArray().getRangeReadings();
+    	
     	errorSensorArray.clear();
-        for (Double x : trueRobot.getSensorArray().getRangeReadings()) {
-        	errorSensorArray.add(rangeSensorErrorModel(x));
+        for (Double angle : rangeSet.keySet()) {
+        	errorSensorArray.put(angle, rangeSensorErrorModel(rangeSet.get(angle)));
         }
     }
 
@@ -206,29 +206,17 @@ public class Environment extends Observable implements KeyListener {
     }
     
     /**
-     * Gets a list of the current range sensor readings.
-     * @return An ordered list of doubles that are the range sensor readings.
+     * Gets a set of sensor angles and current range sensor readings.
+     * @return A set of key/value pairs indicating the angle and current range reading
      */
-    synchronized public List<Double> getRobotSensorReadings() {
-    	List<Double> retVal = new LinkedList<Double>();
-    	for (Double x : errorSensorArray) {
-    		retVal.add(new Double(x));
+    synchronized public Map<Double, Double> getRobotSensorReadings() {
+    	Map<Double, Double> retVal = new HashMap<Double, Double>();
+    	for (Double x : errorSensorArray.keySet()) {
+    		retVal.put(new Double(x), new Double(errorSensorArray.get(x)));
     	}
     	return retVal;
     }
 
-    /**
-     * Gets a list of the sensor angles corresponding to the sensor readings.
-     * @return An ordered list of sensor angles.
-     */
-    synchronized public List<Double> getSensorAngles() {
-    	List<Double> retVal = new LinkedList<Double>();
-    	for (Double x : trueRobot.getSensorArray().getSensorAngles()) {
-    		retVal.add(new Double(x));
-    	}
-    	return retVal;
-	}
-   
     /**
      * 
      * @return
@@ -263,10 +251,8 @@ public class Environment extends Observable implements KeyListener {
 	private final Random rand = new Random();
     private double[] v = {rand.nextGaussian(), rand.nextGaussian()};
     private double[] t = {rand.nextGaussian(), rand.nextGaussian()};
-    private final List<Double> errorSensorArray;
+    private final Map<Double, Double> errorSensorArray;
     private final Path path;
-    private final DecimalFormat df = new DecimalFormat("#.####");
-
     private static final int RESOLUTION = 1;
 
 	synchronized public void keyTyped(KeyEvent e) {}

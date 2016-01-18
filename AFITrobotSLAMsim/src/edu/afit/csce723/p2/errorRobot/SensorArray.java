@@ -10,7 +10,9 @@ package edu.afit.csce723.p2.errorRobot;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Brian Woolley (brian.woolley at ieee.org)
@@ -27,23 +29,31 @@ public class SensorArray {
 		rangeFinders.add(new RangeFinder(angle, maxRange));
 	}
 	
-	public List<Double> getNormalizedRangeReadings() {
-		List<Double> ranges = new ArrayList<Double>();
+	/**
+	 * Returns a map of sensor angles paired with the associated range value 
+	 * @return A key/value pair denoting the sensor angle and the range value 
+	 */
+	private Map<Double, Double> getNormalizedRangeReadings() {
+		Map<Double, Double> ranges = new HashMap<Double, Double>();
 		for(RangeFinder x : rangeFinders) {
-			ranges.add(x.reading()/x.getMaxRange());
+			ranges.put(x.getAngle(), x.reading()/x.getMaxRange());
 		}
 		return ranges;		
 	}
 
-	public List<Double> getRangeReadings() {
-		List<Double> ranges = new ArrayList<Double>();
+	/**
+	 * Returns a map of sensor angles paired with the associated range value 
+	 * @return A key/value pair denoting the sensor angle and the range value 
+	 */
+	public Map<Double, Double> getRangeReadings() {
+		Map<Double, Double> ranges = new HashMap<Double, Double>();
 		for(RangeFinder x : rangeFinders) {
-			ranges.add(x.reading());
+			ranges.put(x.getAngle(), x.reading());
 		}
 		return ranges;
 	}
 
-	public List<Double> getSensorAngles() {
+	private List<Double> getSensorAngles() {
 		List<Double> angles = new ArrayList<Double>();
 		for(RangeFinder x : rangeFinders) {
 			angles.add(x.getAngle());

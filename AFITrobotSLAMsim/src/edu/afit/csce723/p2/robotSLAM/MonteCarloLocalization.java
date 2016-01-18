@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import edu.afit.csce723.p2.errorRobot.Environment;
@@ -33,7 +34,7 @@ public class MonteCarloLocalization implements EstimationApproach {
 	private Position robotPose;
 	private double robotVelocity;
 	private double robotTurnRate;
-	private List<Double> robotSensorReadings;
+	private Map<Double, Double> robotSensorReadings;
 	private List<Position> population = new ArrayList<Position>();
 	private Random rand = new Random();	
 	private Maze theMap;
@@ -51,7 +52,7 @@ public class MonteCarloLocalization implements EstimationApproach {
 		for (int i=0; i<POPULATION_SIZE; i++) {
 			population.add(new Position(environment.getRobotPose()));
 		}
-		panelA.setPositions(population);
+		f_positionEstimatePanel.setPositions(population);
 	}
 
 	public void update(Environment subject) {	
@@ -78,7 +79,14 @@ public class MonteCarloLocalization implements EstimationApproach {
 		for (Position pose : population) {
 			Robot aRobot = new Robot(pose);
 			Util.trimRobotSensors(aRobot, theMap);
-			scores.add(Util.euclidianDistance(robotSensorReadings, aRobot.getSensorArray().getRangeReadings()));
+			
+			List<Double> actual = new ArrayList<Double>();
+			List<Double> hypothesis = new ArrayList<Double>();
+			for (Double key : robotSensorReadings.keySet()) {
+				actual.add(robotSensorReadings.get(key));
+				hypothesis.add(aRobot.getSensorArray().getRangeReadings().get(key));
+			}
+			scores.add(Util.euclidianDistance(actual, hypothesis));
 		}
 		scores = Util.normalizeMinusOne(scores);
 
@@ -98,8 +106,8 @@ public class MonteCarloLocalization implements EstimationApproach {
 		// aligned with the actual map---most of the time---GOOD LUCK!!
 		
 		// Paint the current position distribution on PanelA.
-		panelA.setPositions(population);
-		panelA.repaint();
+		f_positionEstimatePanel.setPositions(population);
+		f_positionEstimatePanel.repaint();
 	}
 
 	private List<Position> updatePopulationPositionsFromRobotMotion() {
@@ -164,16 +172,18 @@ public class MonteCarloLocalization implements EstimationApproach {
 
 	public Component getPositionEstimatePanel() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelA;
+		return f_positionEstimatePanel;
 	}
 
 	public Component getInternalMapPanel() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelB;
+		return f_internalMapPanel;
 	}
 
-	private final PositionEstimatePanel panelA = new PositionEstimatePanel();  // For rendering the population's distribution of positions
-	private final InternalMapPanel panelB = new InternalMapPanel();  // For rendering the systems internal map
+	// For rendering the population's distribution of positions
+	private final PositionEstimatePanel f_positionEstimatePanel = new PositionEstimatePanel();
+	// For rendering the systems internal map
+	private final InternalMapPanel f_internalMapPanel = new InternalMapPanel();
 
 	private static final int POPULATION_SIZE = 1000;
 }

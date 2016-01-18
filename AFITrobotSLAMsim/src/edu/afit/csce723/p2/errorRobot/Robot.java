@@ -31,7 +31,7 @@ public class Robot {
 		// Setup the rangeFinder array
 		maxSensorRange = 10000;
 		sensorArray = new SensorArray();
-		for (int i=-180; i<180; i+=60) {
+		for (int i=-180; i<180; i+=30) {
 			sensorArray.addRangeFinder( i*degs, maxSensorRange);
 		}
 //		sensorArray.addRangeFinder( 60*degs, maxSensorRange);

@@ -14,15 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.JPanel;
-
 import edu.afit.csce723.p2.errorRobot.Environment;
 import edu.afit.csce723.p2.errorRobot.Maze;
 import edu.afit.csce723.p2.errorRobot.Observer;
 import edu.afit.csce723.p2.errorRobot.Position;
 import edu.afit.csce723.p2.errorRobot.RobotSLAM;
-import edu.afit.csce723.p2.robotSLAM.PositionEstimatePanel;
-import edu.afit.csce723.p2.robotSLAM.InternalMapPanel;
 
 /**
  * @author Sutdent 1
@@ -52,7 +48,6 @@ public class KidnappedRobot implements Observer<Environment> {
 		subject.getRobotVelocity();  // The velocity according to the robot. 
 		subject.getRobotTurnRate();  // The turn rate according to the robot. 
 		subject.getRobotSensorReadings(); // The sensor range readings from the robot. 
-		subject.getSensorAngles(); 	 // The relative angle of each sensors reading. 
 		
 		// TODO This is where you will implement your kidnaped robot algorithm.
 		
@@ -72,20 +67,20 @@ public class KidnappedRobot implements Observer<Environment> {
 		// ---GOOD LUCK!!--
 		
 		// There are two JPanels registered to the main window for you to paint on. 
-		panelA.repaint();
-		panelB.repaint();
+		f_positionEstimatePanel.repaint();
+		f_internalMapPanel.repaint();
 	}
 
 	public Component getPanelA() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelA;
+		return f_positionEstimatePanel;
 	}
 
 	public Component getPanelB() {
 		// TODO This panel is registered to the main panel for your use.
-		return panelB;
+		return f_internalMapPanel;
 	}
 
-	private final PositionEstimatePanel panelA = new PositionEstimatePanel();  // For rendering the population's distribution of positions
-	private final InternalMapPanel panelB = new InternalMapPanel();  // For rendering the systems internal map
+	private final PositionEstimatePanel f_positionEstimatePanel = new PositionEstimatePanel();  // For rendering the population's distribution of positions
+	private final InternalMapPanel f_internalMapPanel = new InternalMapPanel();  // For rendering the systems internal map
 }

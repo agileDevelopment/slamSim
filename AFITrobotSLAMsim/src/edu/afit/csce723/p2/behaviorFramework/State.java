@@ -9,6 +9,7 @@
 package edu.afit.csce723.p2.behaviorFramework;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.afit.csce723.p2.errorRobot.Robot;
 
@@ -43,8 +44,8 @@ public class State {
 		return myRobot.getPosition().getTheta();
 	}
 	
-	public List<Double> getRangeReadings() {
-		return myRobot.getSensorArray().getNormalizedRangeReadings();
+	public Map<Double, Double> getRangeReadings() {
+		return myRobot.getSensorArray().getRangeReadings();
 	}
 	
 	private final Robot myRobot;

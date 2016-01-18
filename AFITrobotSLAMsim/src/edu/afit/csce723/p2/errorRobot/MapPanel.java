@@ -9,17 +9,13 @@
 
 package edu.afit.csce723.p2.errorRobot;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -32,22 +28,20 @@ import edu.afit.csce723.p2.util.Util;
 public class MapPanel extends JPanel implements Observer<Environment> {
 	
 	public MapPanel(Environment env) {
-		assert (env != null);
-		theMaze = env.getMap();
+		if (env == null) throw new IllegalArgumentException("Environment cannot be null.");
 		env.registerObserver(this);
-		repaint();
+		update(env);
 	}
 
 	synchronized public void update(Environment env) {
+		theMaze = env.getMap();
 		robotPose = new Position(env.getRobotPose());
 		robotPath.add(robotPose);
-		List<Double> ranges = env.getRobotSensorReadings();
-		List<Double> angles = env.getSensorAngles();
+		Map<Double, Double> rangeReadings = env.getRobotSensorReadings();
 		
-		assert(ranges.size() == angles.size());
 		Collection<Point2D> current = new ArrayList<Point2D>();
-		for (int i=0; i<ranges.size(); i++) {
-			current.add(convertToCartesian(robotPose, angles.get(i), ranges.get(i)));
+		for (Double angleKey : rangeReadings.keySet()) {
+			current.add(convertToCartesian(robotPose, angleKey, rangeReadings.get(angleKey)));
 		}
 		
 		if (sensors.size() > 10) {
