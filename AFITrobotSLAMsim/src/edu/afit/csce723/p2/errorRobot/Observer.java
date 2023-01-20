@@ -15,5 +15,8 @@ package edu.afit.csce723.p2.errorRobot;
  */
 public interface Observer<Subject> {
 
+	/**
+	 * @param subject
+	 */
 	public void update(Subject subject);
 }
