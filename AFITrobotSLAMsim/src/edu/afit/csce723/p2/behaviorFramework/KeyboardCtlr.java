@@ -36,6 +36,33 @@ public class KeyboardCtlr implements Behavior, KeyListener {
         } else if (c == 's') {
             currentAction.setVelocity(-1.0);
         }
+
+        // Provide support for Arrow Keys
+        switch (e.getKeyCode()) {
+            // Forward (Up Arrow Depressed)
+            case KeyEvent.VK_UP:
+                currentAction.setVelocity(1.0);
+                break;
+
+            // Reverse (Down Arrow Depressed)
+            case KeyEvent.VK_DOWN:
+                currentAction.setVelocity(-1.0);
+                break;
+
+            // Turn Left (Left Arrow Depressed)
+            case KeyEvent.VK_LEFT:
+                currentAction.setTurnRate(-1.0);
+                break;
+
+            // Turn Right (Right Arrow Depressed)
+            case KeyEvent.VK_RIGHT:
+                currentAction.setTurnRate(1.0);
+                break;
+
+            default:
+                // Ignore all other key strokes
+                break;
+        }
     }
 
     synchronized public void keyReleased(KeyEvent e) {
@@ -50,9 +77,36 @@ public class KeyboardCtlr implements Behavior, KeyListener {
         } else if (c == 's') {
             currentAction.setVelocity(Math.max(currentAction.velocity, 0.0));
         }
+
+        // Provide support for Arrow Keys
+        switch (e.getKeyCode()) {
+            // Forward (Up Arrow Released)
+            case KeyEvent.VK_UP:
+                currentAction.setVelocity(0.0);
+                break;
+
+            // Reverse (Down Arrow Released)
+            case KeyEvent.VK_DOWN:
+                currentAction.setVelocity(0.0);
+                break;
+
+            // Turn Left (Left Arrow Released)
+            case KeyEvent.VK_LEFT:
+                currentAction.setTurnRate(0.0);
+                break;
+
+            // Turn Right (Right Arrow Released)
+            case KeyEvent.VK_RIGHT:
+                currentAction.setTurnRate(0.0);
+                break;
+
+            default:
+                // Ignore all other key strokes
+                break;
+        }
     }
 
     synchronized public void keyTyped(KeyEvent arg0) {
-        // nothing to do here		
+        // nothing to do here
     }
 }

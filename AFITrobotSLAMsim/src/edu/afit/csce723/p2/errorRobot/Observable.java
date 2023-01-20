@@ -18,18 +18,18 @@ import java.util.Set;
 public class Observable {
     
 	public void notifyObservers(Environment env) {
-		for(Observer o : observers) {
+		for(Observer<Environment> o : observers) {
 			o.update(env);
 		}
 	}
 	
-	public void registerObserver(Observer o) {
+	public void registerObserver(Observer<Environment> o) {
 		observers.add(o);
 	}
 	
-	public boolean removeObserver(Observer o) {
+	public boolean removeObserver(Observer<Environment> o) {
 		return observers.remove(o);
 	}
 	
-	private Set<Observer> observers = new HashSet<Observer>();
+	private Set<Observer<Environment>> observers = new HashSet<Observer<Environment>>();
 }

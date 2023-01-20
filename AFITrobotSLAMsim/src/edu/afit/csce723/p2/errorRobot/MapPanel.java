@@ -12,7 +12,6 @@ package edu.afit.csce723.p2.errorRobot;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
