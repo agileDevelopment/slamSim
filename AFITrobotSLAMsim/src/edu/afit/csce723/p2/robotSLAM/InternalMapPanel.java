@@ -11,15 +11,13 @@ package edu.afit.csce723.p2.robotSLAM;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.swing.JPanel;
 
 import edu.afit.csce723.p2.errorRobot.MazeRenderingTool;
-import edu.afit.csce723.p2.errorRobot.Robot;
-import edu.afit.csce723.p2.gridMap.SimpleMap;
 
 /**
  * @author Sutdent 1
@@ -30,22 +28,19 @@ public class InternalMapPanel extends JPanel {
 
 	synchronized public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		renderer.renderPoints(gridMap.getPoints(), 1, Color.DARK_GRAY, g, getSize());
-	}
-
-	public void internalMapUpdate(Robot aRobot) {
-		for (Line2D beam : aRobot.getSensorArray().getBeams()) {
-			gridMap.reinforce(beam.getP2());
-		}
+		renderer.renderPoints(gridMap, 2, Color.DARK_GRAY, g, getSize());
 	}
 
 	public void internalMapUpdate(Collection<Point2D> points) {
 		for (Point2D point : points) {
-			gridMap.reinforce(point);
+			gridMap.addLast(point);
+		}
+		while (gridMap.size() > 12288) {
+			gridMap.removeFirst();
 		}
 	}
 
-	private SimpleMap gridMap = new SimpleMap();
+	private final LinkedList<Point2D> gridMap = new LinkedList<Point2D>();
 	private MazeRenderingTool renderer = new MazeRenderingTool();
 
 	/**
