@@ -25,7 +25,7 @@ public class EnvPanel extends JPanel implements Observer<Environment> {
         update(env);
     }
 
-	synchronized public void update(Environment env) {
+    synchronized public void update(Environment env) {
         theMap = env.getMap();
         theRobot = env.getRobot();
         thePath = env.getPath();
@@ -33,9 +33,16 @@ public class EnvPanel extends JPanel implements Observer<Environment> {
     }
 
     synchronized public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.BLUE);
-        renderer.renderEnvironment(theMap, theRobot, thePath, g, getSize());
+        try {
+            super.paintComponent(g);
+    	    g.translate(-theMap.getOffset().width, -theMap.getOffset().height);
+            g.setColor(Color.BLUE);
+            renderer.renderMap(theMap, g, getSize());
+            renderer.renderPath(thePath, g, getSize());
+            renderer.renderRobot(theRobot, g, getSize());
+        } catch (Exception e) {
+            // Do Nothing, draw it next time.
+        }
     }
 
     private Maze theMap;

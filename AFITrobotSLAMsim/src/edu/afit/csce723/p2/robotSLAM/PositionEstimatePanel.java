@@ -29,26 +29,30 @@ import edu.afit.csce723.p2.errorRobot.Robot;
 public class PositionEstimatePanel extends JPanel {
 
 	synchronized public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.translate(-theMap.getOffset().width, -theMap.getOffset().height);
-        renderer.drawTheMaze(theMap, g, getSize());
-        if (positions != null) {
-        	renderer.renderPositions(positions, 1, Color.RED, g, getSize());
-        }
-    }
+		try {
+			super.paintComponent(g);
+			g.translate(-theMap.getOffset().width, -theMap.getOffset().height);
+			renderer.renderMap(theMap, g, getSize());
+			if (positions != null) {
+				renderer.renderPositions(positions, 5, Color.RED, g, getSize());
+			}
+		} catch (Exception e) {
+			// Do Nothing, draw it next time.
+		}
+	}
 
 	synchronized public void setPositions(Collection<Position> population) {
 		positions.clear();
 		for (Position pose : population) {
-			positions.add(new Position(pose));		
+			positions.add(new Position(pose));
 		}
 	}
 
 	private Maze theMap = Maze.getExplorerMap();
-    private Robot theRobot;
-    private Collection<Position> positions = new HashSet<Position>();
-    private MazeRenderingTool renderer = new MazeRenderingTool();
-    /**
+	private Robot theRobot;
+	private Collection<Position> positions = new HashSet<Position>();
+	private MazeRenderingTool renderer = new MazeRenderingTool();
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3728034301044215454L;

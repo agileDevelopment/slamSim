@@ -29,19 +29,16 @@ import edu.afit.csce723.p2.gridMap.SimpleMap;
 public class InternalMapPanel extends JPanel {
 
 	synchronized public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        renderer.setBackground(Color.BLACK, g, getSize());
-        for (Point2D pt : gridMap.getPoints()) {
-        	renderer.drawPoint(pt, 1, Color.WHITE, g, getSize());
-        }
-    }
+		super.paintComponent(g);
+		renderer.renderPoints(gridMap.getPoints(), 1, Color.DARK_GRAY, g, getSize());
+	}
 
 	public void internalMapUpdate(Robot aRobot) {
 		for (Line2D beam : aRobot.getSensorArray().getBeams()) {
 			gridMap.reinforce(beam.getP2());
 		}
 	}
-	
+
 	public void internalMapUpdate(Collection<Point2D> points) {
 		for (Point2D point : points) {
 			gridMap.reinforce(point);
@@ -49,9 +46,9 @@ public class InternalMapPanel extends JPanel {
 	}
 
 	private SimpleMap gridMap = new SimpleMap();
-    private MazeRenderingTool renderer = new MazeRenderingTool();
+	private MazeRenderingTool renderer = new MazeRenderingTool();
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8615102274248226257L;
