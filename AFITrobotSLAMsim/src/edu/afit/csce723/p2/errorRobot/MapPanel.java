@@ -9,6 +9,7 @@
 
 package edu.afit.csce723.p2.errorRobot;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
@@ -25,49 +26,60 @@ import edu.afit.csce723.p2.util.Util;
  *
  */
 public class MapPanel extends JPanel implements Observer<Environment> {
-	
+
 	public MapPanel(Environment env) {
-		if (env == null) throw new IllegalArgumentException("Environment cannot be null.");
+		if (env == null)
+			throw new IllegalArgumentException("Environment cannot be null.");
+		robotPath = new Path();
+		renderer = new MazeRenderingTool();
+		sensors = new LinkedList<Collection<Point2D>>();
 		env.registerObserver(this);
 		update(env);
 	}
 
 	synchronized public void update(Environment env) {
-		theMaze = env.getMap();
-		robotPose = new Position(env.getRobotPose());
-		robotPath.add(robotPose);
-		Map<Double, Double> rangeReadings = env.getRobotSensorReadings();
-		
-		Collection<Point2D> current = Util.convertToCartesian(robotPose, rangeReadings);
-		
-		if (sensors.size() > 10) {
+		theMap = env.getMap();
+		robotPath.add(env.getRobotPose());
+
+		while (sensors.size() > 10) {
 			sensors.removeFirst();
 		}
-		sensors.addLast(current);
+
+		// TODO: This is a good cadidate for functional refactoring
+		sensors.addLast(Util.convertToCartesian(env.getRobotPose(), env.getRobotSensorReadings()));
 		repaint();
 	}
-	
+
 	synchronized public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        
-        Dimension offset = theMaze.getOffset();
-        g.translate(-offset.width, -offset.height);
-    	renderer.renderEnvironment(theMaze, robotPath, g, getSize());
+		try {
+			super.paintComponent(g);
+			g.translate(-theMap.getOffset().width, -theMap.getOffset().height);
 
-    	for (Collection<Point2D> set : sensors) {
-        	renderer.renderSensorEnvironment(theMaze, set, g, getSize());
-        }
-}
+			// TODO: Move the offset responsibility into the MapRenderingTool so that it can
+			// be scaled with all that needs to be painted.
+			// Dimension offset = theMap.getOffset();
+			// g.translate(-offset.width, -offset.height);
 
-	private Maze theMaze;
-	private Position robotPose;
-	private final Path robotPath = new Path();
-	private final LinkedList<Collection<Point2D>> sensors = new LinkedList<Collection<Point2D>>();
-    private MazeRenderingTool renderer = new MazeRenderingTool();
-	// private List<Point2D> allSensors;
-	// private Path path;
+			// TODO: Maybe here we pass render a collection of drawable objects
+			// and we caluate the footprint and offset ad scaling factor?
+			// renderer.setSize(new Dimension(0, 0));
 
-    /** Auto-generated serial-ID */
+			renderer.renderMap(theMap, g, getSize());
+			renderer.renderPath(robotPath, g, getSize());
+			for (Collection<Point2D> points : sensors) {
+				renderer.renderPoints(points, 1, Color.RED, g, getSize());
+			}
+		} catch (Exception e) {
+			// Do Nothing, draw it next time.
+		}
+	}
+
+	private Maze theMap;
+	private final Path robotPath;
+	private final LinkedList<Collection<Point2D>> sensors;
+	private final MazeRenderingTool renderer;
+
+	/** Auto-generated serial-ID */
 	private static final long serialVersionUID = -8449592975783107600L;
 
 }

@@ -10,8 +10,6 @@ package edu.afit.csce723.p2.errorRobot;
 
 import java.util.LinkedList;
 
-import javax.management.InvalidAttributeValueException;
-
 /**
  *
  * @author Brian Woolley (brian.woolley at ieee.org)
