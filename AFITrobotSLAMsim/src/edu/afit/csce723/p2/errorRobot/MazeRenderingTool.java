@@ -43,7 +43,7 @@ public class MazeRenderingTool {
     }
 
     public void renderPoints(Collection<Point2D> points, int radius, Color aColor, Graphics g, Dimension size) {
-        drawPoints(points, radius, Color.RED, g, size);
+        drawPoints(points, radius, aColor, g, size);
     }
 
     public void renderPositions(Collection<Position> poses, int length, Color aColor, Graphics g, Dimension size) {

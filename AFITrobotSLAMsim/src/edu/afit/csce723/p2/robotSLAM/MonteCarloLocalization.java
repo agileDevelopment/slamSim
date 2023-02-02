@@ -36,91 +36,120 @@ public class MonteCarloLocalization implements EstimationApproach {
 	private double robotTurnRate;
 	private Map<Double, Double> robotSensorReadings;
 	private List<Position> population = new ArrayList<Position>();
-	private Random rand = new Random();	
+	private Random rand = new Random();
 	private Maze theMap;
 
 	/**
-     * @param args
-     */
-    public static void main(String[] args) {
-    	new RobotSLAM(new MonteCarloLocalization(), Maze.getExplorerMap()).run();
-    }
-    
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new RobotSLAM(new MonteCarloLocalization(), Maze.getExplorerMap()).run();
+	}
+
 	public void setup(Environment environment, Maze map) {
-		theMap = map;		
+		theMap = map;
 		environment.registerObserver(this);
-		for (int i=0; i<POPULATION_SIZE; i++) {
+		for (int i = 0; i < POPULATION_SIZE; i++) {
 			population.add(new Position(environment.getRobotPose()));
 		}
 		f_positionEstimatePanel.setPositions(population);
 	}
 
-	public void update(Environment subject) {	
+	public void update(Environment subject) {
 		// This is where you will implement your MCL algorithm.
-		
+
 		// You can create any additional classes that you want within the
 		// edu.afit.csce723.p2.robotSLAM package, this is your workspace.
 		// Do not modify the contents of the other packages.
-		
+
 		// The goal is to monitor the environment values to localize the robot
-		// within the map, despite motion errors.  This work will form the basis
+		// within the map, despite motion errors. This work will form the basis
 		// for the fastSLAM particle-based algorithm implemented in Part III.
 
-		robotPose = subject.getRobotPose();						// Where the robot believes that it is.
-		robotVelocity = subject.getRobotVelocity();				// The velocity according to the robot.
-		robotTurnRate = subject.getRobotTurnRate();				// The turn rate according to the robot.
-		robotSensorReadings = subject.getRobotSensorReadings();	// The sensor range readings from the robot.
+		robotPose = subject.getRobotPose(); // Where the robot believes that it is.
+		robotVelocity = subject.getRobotVelocity(); // The velocity according to the robot.
+		robotTurnRate = subject.getRobotTurnRate(); // The turn rate according to the robot.
+		robotSensorReadings = subject.getRobotSensorReadings(); // The sensor range readings from the robot.
 
-		// Step 1:  Update population positions based on robot motion
+		// Step 1: Update population positions based on robot motion
 		population = updatePopulationPositionsFromRobotMotion();
 
-		// Step 2:  Score hypothetical population sensor readings against actual robot sensors
-		List<Double> scores = new ArrayList<Double>();
-		for (Position pose : population) {
-			Robot aRobot = new Robot(pose);
-			Util.trimRobotSensors(aRobot, theMap);
-			
-			List<Double> actual = new ArrayList<Double>();
-			List<Double> hypothesis = new ArrayList<Double>();
-			for (Double key : robotSensorReadings.keySet()) {
-				actual.add(robotSensorReadings.get(key));
-				hypothesis.add(aRobot.getSensorArray().getRangeReadings().get(key));
-			}
-			scores.add(Util.euclidianDistance(actual, hypothesis));
-		}
-		scores = Util.normalizeMinusOne(scores);
-
+		// Step 2: Score hypothetical population sensor readings against actual robot
+		// sensors
+		/*
+		 * List<Double> scores = new ArrayList<Double>();
+		 * for (Position pose : population) {
+		 * Robot aRobot = new Robot(pose);
+		 * Util.trimRobotSensors(aRobot, theMap);
+		 * 
+		 * List<Double> actual = new ArrayList<Double>();
+		 * List<Double> hypothesis = new ArrayList<Double>();
+		 * for (Double key : robotSensorReadings.keySet()) {
+		 * actual.add(robotSensorReadings.get(key));
+		 * hypothesis.add(aRobot.getSensorArray().getRangeReadings().get(key));
+		 * }
+		 * scores.add(Util.euclidianDistance(actual, hypothesis));
+		 * }
+		 * scores = Util.normalizeMinusOne(scores);
+		 */
 		// Step 3: Apply MonteCarlo and SUS selection to form a new population of points
 		// population = MonteCarlo(population, scores, POPULATION_SIZE);
-		
+
 		// TODO apply SUS to select a new population of points
-		population = SUS(population, scores, POPULATION_SIZE);
-		
+		// population = SUS(population, scores, POPULATION_SIZE);
+
 		// TODO How does SUS differ from MonteCarlo selection?
-				
+
 		// Once you have a new position estimate, the robot pose can be adjusted
 		// by passing a new absolute position
-		subject.adjustRobotPose(getPopulationCentroid(population));
-		
+		// subject.adjustRobotPose(getPopulationCentroid(population));
+
 		// If done right, the path and sensor readings on the upper right will
 		// aligned with the actual map---most of the time---GOOD LUCK!!
-		
+
 		// Paint the current position distribution on PanelA.
 		f_positionEstimatePanel.setPositions(population);
 		f_positionEstimatePanel.repaint();
+
+		f_internalMapPanel.internalMapUpdate(Util.convertToCartesian(robotPose, robotSensorReadings));
+		f_internalMapPanel.repaint();
 	}
 
 	private List<Position> updatePopulationPositionsFromRobotMotion() {
 		// Add random Gaussian noise to the robot motion
-		// TODO:  Experiment with sigma values of 0.2, 0.33, 0.66, 0.8, and 1.0
-		double sigma = 1.0; 
+		// TODO: Experiment with sigma values of 0.2, 0.33, 0.66, 0.8, and 1.0
+		double sigma = 1.0;
 
-		List<Position> newPopulation = new ArrayList<Position>();
-		for (Position pose : population) {
-			// TODO: Here you will perturb the position of the current population
-        	newPopulation.add(robotPose);
+		if (robotVelocity == 0.0 && robotTurnRate == 0.0) {
+			return population;
 		}
-		return newPopulation;
+
+		List<Position> nextPopulation = new ArrayList<Position>();
+		for (Position pose : population) {
+			// Generate a random percent perturbation
+			double rand = sigma * Math.random() - 0.5;
+
+			// Apply the random perturbation to the turnRate
+			// Conditional ternary handles unatural case of exactly NO turnRate
+			double dTheta = robotTurnRate == 0.0 ? rand : robotTurnRate + (robotTurnRate * rand);
+
+			double theta = pose.getTheta() + dTheta;
+
+			// Apply the random perturbation to the velocity
+			// Conditional ternary handles unatural case of exactly NO velocity
+			double velocity = robotVelocity == 0.0 ? rand : robotVelocity + (robotVelocity * rand);
+
+			// Compute an expected position diference (delta) based on the perturbed
+			// velocity and turn rate
+			double dx = velocity * Math.cos(theta);
+			double dy = velocity * Math.sin(theta);
+			Position delta = new Position(dx, dy, dTheta);
+
+			// Add the previous position + the perturbed delta position to the next
+			// population
+			nextPopulation.add(pose.add(delta));
+		}
+		return nextPopulation;
 	}
 
 	private Position getPopulationCentroid(Collection<Position> aPopulation) {
@@ -139,28 +168,29 @@ public class MonteCarloLocalization implements EstimationApproach {
 	}
 
 	private List<Position> MonteCarlo(List<Position> population, List<Double> scores, int n) {
-		if (population.size() != scores.size()) 
+		if (population.size() != scores.size())
 			throw new IllegalStateException(
 					"Population List and Score List must be the same length!");
 
 		List<Position> keep = new ArrayList<Position>();
-		for (int i=0; i<population.size(); i++) {
+		for (int i = 0; i < population.size(); i++) {
 			// TODO: Here you will need to add your MonteCarlo selection algorithm
 			keep.add(new Position(population.get(i)));
 		}
 
 		if (keep.size() != n)
-			throw new IllegalStateException("Resulting MonteCarlo population size should be " + n + " but is " + keep.size());
+			throw new IllegalStateException(
+					"Resulting MonteCarlo population size should be " + n + " but is " + keep.size());
 		return keep;
 	}
-	
+
 	private List<Position> SUS(List<Position> population, List<Double> scores, int n) {
-		if (population.size() != scores.size()) 
+		if (population.size() != scores.size())
 			throw new IllegalStateException(
 					"Population List and Score List must be the same length!");
 
 		List<Position> keep = new ArrayList<Position>();
-		for (int i=0; i<population.size(); i++) {
+		for (int i = 0; i < population.size(); i++) {
 			// TODO: Here you will need to add your Stochastic Universal Sampling algorithm
 			keep.add(new Position(population.get(i)));
 		}

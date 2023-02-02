@@ -19,15 +19,15 @@ import edu.afit.csce723.p2.util.Util;
 public class Position extends Point2D {
 
     public Position(double x, double y, double theta) {
-      setLocation(x, y);
-      this.theta = Util.normalize(theta);
+        setLocation(x, y);
+        this.theta = Util.normalize(theta);
     }
 
     public Position(Position aPosition) {
-    	this(aPosition.x, aPosition.y, aPosition.theta); 
-	}
+        this(aPosition.x, aPosition.y, aPosition.theta);
+    }
 
-	public boolean equals(Position pose) {
+    public boolean equals(Position pose) {
         boolean equal = true;
         if (x != pose.x) {
             equal = false;
@@ -51,14 +51,16 @@ public class Position extends Point2D {
         return y;
     }
 
-	@Override
-	public void setLocation(double x, double y) {
-		this.x = x;
-		this.y = y;
-	}
+    @Override
+    public void setLocation(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
 
-	/**
-     * Returns the Theta angle of this <code>Position</code> in <code>double</code> precision [-Pi .. Pi].
+    /**
+     * Returns the Theta angle of this <code>Position</code> in <code>double</code>
+     * precision [-Pi .. Pi].
+     * 
      * @return The Theta angle of this <code>Position</code>.
      */
     public double getTheta() {
@@ -66,25 +68,26 @@ public class Position extends Point2D {
     }
 
     /**
-     * Adds the vector values of two Position objects 
+     * Adds the vector values of two Position objects
+     * 
      * @param other The other position to add to this one.
      * @return The new Position object
      */
-    protected Position add(Position other) {
-    	return add(other.x, other.y, other.theta);
+    public Position add(Position other) {
+        return add(other.x, other.y, other.theta);
     }
-    
+
     public Position add(double dx, double dy, double dTheta) {
         double x = this.x + dx,
-               y = this.y + dy,
-               t = Util.normalize(theta + dTheta);
+                y = this.y + dy,
+                t = Util.normalize(theta + dTheta);
         return new Position(x, y, t);
     }
-    
+
     private double x, y, theta;
 
-	public Point2D getPoint2D() {
-		return this;
-//		return new Point2D.Double(x, y);
-	}
+    public Point2D getPoint2D() {
+        return this;
+        // return new Point2D.Double(x, y);
+    }
 }
